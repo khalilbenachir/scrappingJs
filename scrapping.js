@@ -5,39 +5,26 @@ const url =
   "https://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313&_sacat=0&_nkw=";
 
 const searchProduct = keyword => {
-  const ttt =
-    "https://www.ebay.com/sch/i.html?_ftrt=901&_udlo=8&_sop=12&_sadis=15&_dmd=1&LH_ItemCondition=3&LH_BIN=1&_mPrRngCbx=1&_ftrv=1&_from=R40&_sacat=0&_fosrp=1&_nkw=toy&LH_LocatedIn=45&_ipg=200&rt=nc";
+  const searchURL = `https://www.ebay.com/sch/i.html?_ftrt=901&_udlo=8&_sop=12&_sadis=15&_dmd=1&LH_ItemCondition=3&LH_BIN=1&_mPrRngCbx=1&_ftrv=1&_from=R40&_sacat=0&_fosrp=1&_nkw=${keyword}&LH_LocatedIn=45&_ipg=200&rt=nc`;
   return axios
-    .get(
-      "https://www.ebay.com/sch/i.html?_sacat=0&_mPrRngCbx=1&_udlo=8&_udhi=&LH_ItemCondition=3&_ftrt=901&_ftrv=1&_sabdlo=&_sabdhi=&_samilow=&_samihi=&_sadis=15&_stpos=&_sop=12&_dmd=1&_fosrp=1&_nkw=women&LH_LocatedIn=45&_pgn=2&_skc=200&rt=nc"
-    )
+    .get(searchURL)
     .then(res => {
       return res.data;
     })
     .then(body => {
       const items = [];
       const $ = cheerio.load(body);
-      $(".lvresult").each((index, element) => {
-        console.log(
-          $("li")
-            .attr("r")
-            .html()
-        );
+      $(".clearfix").each((index, element) => {
+        console.log(index);
         const item = {
-          title: $("li")
-            .attr("r")
+          title: $(element)
+            .find(".lvtitle")
             .text(),
           price: $(element)
-            .find(".s-item__price")
+            .find(".lvprice.prc")
             .text(),
-          location: $(element)
-            .find(".s-item__itemLocation")
-            .text(),
-          link: $(element)
-            .find(".s-item__link")
-            .text(),
-          feedBack: $(element)
-            .find(".s-item__seller-info-text")
+          details: $(element)
+            .find(".lvdetails.left.space-zero.full-width")
             .text()
         };
         items.push(item);
@@ -47,14 +34,39 @@ const searchProduct = keyword => {
     .catch(e => console.log(e));
 };
 
-module.exports = { searchProduct };
 
-//https://www.ebay.com/sch/i.html?_from=R40&_nkw=toys&_sacat=0&_pgn=2
+//Bro , here just replace sellerURL WIth new seller url 
 
-const sss =
-  "https://www.ebay.com/sch/i.html?_ftrt=901&_udlo=8&_sop=12&_sadis=15&_dmd=1&LH_ItemCondition=3&LH_BIN=1&_mPrRngCbx=1&_ftrv=1&_from=R40&_sacat=0&_fosrp=1&_nkw=toy&LH_LocatedIn=45&_ipg=200&rt=nc";
-const ttt =
-  "https://www.ebay.com/sch/i.html?_ftrt=901&_udlo=8&_sop=12&_sadis=15&_dmd=1&LH_ItemCondition=3&LH_BIN=1&_mPrRngCbx=1&_ftrv=1&_from=R40&_sacat=0&_fosrp=1&_nkw=toy&LH_LocatedIn=45&_ipg=200&rt=nc";
-const nnn = "";
-const mmm =
-  "https://www.ebay.com/sch/i.html?_ftrt=901&_udlo=8&_sop=12&_sadis=15&_dmd=1&LH_ItemCondition=3&LH_BIN=1&_mPrRngCbx=1&_ftrv=1&_from=R40&_sacat=0&_fosrp=1&_nkw=toy&LH_LocatedIn=45&_pgn=2&_skc=200&rt=nc";
+const searchSellerDetails = () => {
+  const sellerURL =
+    "https://www.ebay.com/itm/TOY-STORY-SHERIFF-WOODY-JESSIE-DOLL-KID-BABY-SOFT-TALKING-ACTION-FIGURES-TOY/202730011755?hash=item2f33a67c6b:m:mn68_oDj6kFDHskzNJBE31Q";
+  return axios
+    .get(sellerURL)
+    .then(res => {
+      return res.data;
+    })
+    .then(body => {
+      const $ = cheerio.load(body);
+      const item = {
+        title: $("#CenterPanel")
+          .find(".it-ttl")
+          .text(),
+        seller: $("#CenterPanel")
+          .find(".mbg-nw")
+          .text(),
+        feedback: $("#CenterPanel")
+          .find(".mbg-l")
+          .text(),
+        link: $("#CenterPanel")
+          .find(".s-item__link")
+          .text(),
+        feedBack: $("#CenterPanel")
+          .find(".s-item__seller-info-text")
+          .text()
+      };
+      return item;
+    })
+    .catch(e => console.log(e));
+};
+
+module.exports = { searchProduct, searchSellerDetails };
